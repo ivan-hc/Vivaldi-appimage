@@ -22,6 +22,7 @@ cat >> ./$APP.AppDir/AppRun << 'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "${0}")")"
 export UNION_PRELOAD="${HERE}"
+export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/:"${HERE}"/lib/:LD_LIBRARY_PATH
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 exec ${HERE}/vivaldi "$@" &&
 exec ${HERE}/update-ffmpeg --user 2> /dev/null
@@ -53,6 +54,7 @@ cat >> ./$APP.AppDir/AppRun << 'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "${0}")")"
 export UNION_PRELOAD="${HERE}"
+export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/:"${HERE}"/lib/:LD_LIBRARY_PATH
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 exec ${HERE}/vivaldi-snapshot "$@" &&
 exec ${HERE}/update-ffmpeg --user 2> /dev/null
