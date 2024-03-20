@@ -7,7 +7,7 @@ URL=$(echo "https://repo.vivaldi.com/snapshot/deb/pool/main/$(wget -q https://re
 
 mkdir tmp
 cd ./tmp
-wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-$(uname -m).AppImage -O appimagetool
+wget -q $(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | grep -v zsync | grep -i continuous | grep -i appimagetool | grep -i x86_64 | grep browser_download_url | cut -d '"' -f 4 | head -1) -O appimagetool
 chmod a+x ./appimagetool
 
 wget $URL
@@ -28,7 +28,7 @@ exec ${HERE}/vivaldi "$@" &&
 exec ${HERE}/update-ffmpeg --user 2> /dev/null
 EOF
 chmod a+x ./$APP.AppDir/AppRun
-ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
+ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./$APP.AppDir
 cd ..
 mv ./tmp/*AppImage ./Vivaldi-Stable-$VERSION-x86_64.AppImage
 
@@ -39,7 +39,7 @@ URL=$(echo "https://repo.vivaldi.com/snapshot/deb/pool/main/$(wget -q https://re
 
 mkdir tmp2
 cd ./tmp2
-wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-$(uname -m).AppImage -O appimagetool
+wget -q $(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | grep -v zsync | grep -i continuous | grep -i appimagetool | grep -i x86_64 | grep browser_download_url | cut -d '"' -f 4 | head -1) -O appimagetool
 chmod a+x ./appimagetool
 
 wget $URL
@@ -60,6 +60,6 @@ exec ${HERE}/vivaldi-snapshot "$@" &&
 exec ${HERE}/update-ffmpeg --user 2> /dev/null
 EOF
 chmod a+x ./$APP.AppDir/AppRun
-ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
+ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./$APP.AppDir
 cd ..
 mv ./tmp2/*AppImage ./Vivaldi-Snapshot-$VERSION-x86_64.AppImage
