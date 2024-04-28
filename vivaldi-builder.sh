@@ -2,12 +2,12 @@
 
 #------------------- VIVALDI STABLE ------------------------
 APP=vivaldi-stable
-VERSION=$(wget -q https://repo.vivaldi.com/snapshot/deb/pool/main/ -O - | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href="vivaldi-stable_).*(?=_amd64.deb">vivaldi)')
-URL=$(echo "https://repo.vivaldi.com/snapshot/deb/pool/main/$(wget -q https://repo.vivaldi.com/snapshot/deb/pool/main/ -O - | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href=").*(?=">vivaldi)')")
+VERSION=$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href="vivaldi-stable_).*(?=_amd64.deb">vivaldi)')
+URL=$(echo "https://repo.vivaldi.com/snapshot/deb/pool/main/$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href=").*(?=">vivaldi)')")
 
 mkdir tmp
 cd ./tmp
-wget -q $(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | grep -v zsync | grep -i continuous | grep -i appimagetool | grep -i x86_64 | grep browser_download_url | cut -d '"' -f 4 | head -1) -O appimagetool
+wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | sed 's/"/ /g; s/ /\n/g' | grep -o 'https.*continuous.*tool.*86_64.*mage$')" -O appimagetool
 chmod a+x ./appimagetool
 
 wget $URL
@@ -34,12 +34,12 @@ mv ./tmp/*AppImage ./Vivaldi-Stable-$VERSION-x86_64.AppImage
 
 #------------------- VIVALDI SNAPSHOT ------------------------
 APP=vivaldi-snapshot
-VERSION=$(wget -q https://repo.vivaldi.com/snapshot/deb/pool/main/ -O - | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href="vivaldi-snapshot_).*(?=_amd64.deb">vivaldi)')
-URL=$(echo "https://repo.vivaldi.com/snapshot/deb/pool/main/$(wget -q https://repo.vivaldi.com/snapshot/deb/pool/main/ -O - | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href=").*(?=">vivaldi)')")
+VERSION=$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href="vivaldi-snapshot_).*(?=_amd64.deb">vivaldi)')
+URL=$(echo "https://repo.vivaldi.com/snapshot/deb/pool/main/$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href=").*(?=">vivaldi)')")
 
 mkdir tmp2
 cd ./tmp2
-wget -q $(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | grep -v zsync | grep -i continuous | grep -i appimagetool | grep -i x86_64 | grep browser_download_url | cut -d '"' -f 4 | head -1) -O appimagetool
+wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | sed 's/"/ /g; s/ /\n/g' | grep -o 'https.*continuous.*tool.*86_64.*mage$')" -O appimagetool
 chmod a+x ./appimagetool
 
 wget $URL
