@@ -1,65 +1,68 @@
 #!/bin/sh
 
-#------------------- VIVALDI STABLE ------------------------
-APP=vivaldi-stable
-VERSION=$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href="vivaldi-stable_).*(?=_amd64.deb">vivaldi)')
-URL=$(echo "https://repo.vivaldi.com/snapshot/deb/pool/main/$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href=").*(?=">vivaldi)')")
+APP=vivaldi
 
-mkdir tmp
-cd ./tmp
-wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | sed 's/"/ /g; s/ /\n/g' | grep -o 'https.*continuous.*tool.*86_64.*mage$')" -O appimagetool
-chmod a+x ./appimagetool
+# TEMPORARY DIRECTORY
+mkdir -p tmp
+cd ./tmp || exit 1
 
-wget $URL
-ar x ./*.deb
-tar xf ./data.tar.xz
-mkdir $APP.AppDir
-mv ./opt/*/* ./$APP.AppDir/
-mv ./usr/share/applications/*.desktop ./$APP.AppDir/
-cp ./$APP.AppDir/*128.png ./$APP.AppDir/vivaldi.png
+# DOWNLOAD APPIMAGETOOL
+if ! test -f ./appimagetool; then
+	wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | sed 's/"/ /g; s/ /\n/g' | grep -o 'https.*continuous.*tool.*86_64.*mage$')" -O appimagetool
+	chmod a+x ./appimagetool
+fi
 
-cat >> ./$APP.AppDir/AppRun << 'EOF'
-#!/bin/sh
-HERE="$(dirname "$(readlink -f "${0}")")"
-export UNION_PRELOAD="${HERE}"
-export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/:"${HERE}"/lib/:LD_LIBRARY_PATH
-EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-exec ${HERE}/vivaldi "$@" &&
-exec ${HERE}/update-ffmpeg --user 2> /dev/null
-EOF
-chmod a+x ./$APP.AppDir/AppRun
-ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./$APP.AppDir
+# CREATE VIVALDI BROWSER APPIMAGES
+
+_create_vivaldi_appimage(){
+	if wget --version | head -1 | grep -q ' 1.'; then
+		wget -q --no-verbose --show-progress --progress=bar "https://repo.vivaldi.com/snapshot/deb/pool/main/$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep -i "$APP-$CHANNEL" | grep amd64 | tail -1 | grep -o -P '(?<=href=").*(?=">vivaldi)')"
+	else
+		wget "https://repo.vivaldi.com/snapshot/deb/pool/main/$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep -i "$APP-$CHANNEL" | grep amd64 | tail -1 | grep -o -P '(?<=href=").*(?=">vivaldi)')"
+	fi
+	ar x ./*.deb
+	tar xf ./data.tar.xz
+	mkdir "$APP".AppDir
+	mv ./opt/*/* ./"$APP".AppDir/
+	mv ./usr/share/applications/*.desktop ./"$APP".AppDir/
+	if [ "$CHANNEL" = "stable" ]; then
+		cp ./"$APP".AppDir/*128.png ./"$APP".AppDir/"$APP".png
+	else
+		cp ./"$APP".AppDir/*128.png ./"$APP".AppDir/"$APP"-"$CHANNEL".png
+	fi
+	tar xf ./control.tar.xz
+	VERSION=$(cat control | grep Version | cut -c 10-)
+
+	cat <<-'HEREDOC' >> ./"$APP".AppDir/AppRun
+	#!/bin/sh
+	APP=CHROME
+	HERE="$(dirname "$(readlink -f "${0}")")"
+	export UNION_PRELOAD="${HERE}"
+	export LD_LIBRARY_PATH="${HERE}"/lib/:"${LD_LIBRARY_PATH}"
+	exec "${HERE}"/$APP "$@" &&
+	exec ${HERE}/update-ffmpeg --user 2> /dev/null
+	HEREDOC
+	chmod a+x ./"$APP".AppDir/AppRun
+	if [ "$CHANNEL" = "stable" ]; then
+		sed -i "s/CHROME/$APP/g" ./"$APP".AppDir/AppRun
+	else
+		sed -i "s/CHROME/$APP-$CHANNEL/g" ./"$APP".AppDir/AppRun
+	fi
+	ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./"$APP".AppDir
+	mv ./*.AppImage ./Vivaldi-"$CHANNEL"-"$VERSION"-x86_64.AppImage || exit 1
+}
+
+CHANNEL="stable"
+mkdir -p "$CHANNEL" && cp ./appimagetool ./"$CHANNEL"/appimagetool && cd "$CHANNEL" || exit 1
+_create_vivaldi_appimage
 cd ..
-mv ./tmp/*AppImage ./Vivaldi-Stable-$VERSION-x86_64.AppImage
+mv ./"$CHANNEL"/*.AppImage ./
 
-#------------------- VIVALDI SNAPSHOT ------------------------
-APP=vivaldi-snapshot
-VERSION=$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href="vivaldi-snapshot_).*(?=_amd64.deb">vivaldi)')
-URL=$(echo "https://repo.vivaldi.com/snapshot/deb/pool/main/$(curl -Ls https://repo.vivaldi.com/snapshot/deb/pool/main/ | grep $APP | grep amd64 | tail -1 | grep -o -P '(?<=href=").*(?=">vivaldi)')")
-
-mkdir tmp2
-cd ./tmp2
-wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | sed 's/"/ /g; s/ /\n/g' | grep -o 'https.*continuous.*tool.*86_64.*mage$')" -O appimagetool
-chmod a+x ./appimagetool
-
-wget $URL
-ar x ./*.deb
-tar xf ./data.tar.xz
-mkdir $APP.AppDir
-mv ./opt/*/* ./$APP.AppDir/
-mv ./usr/share/applications/*.desktop ./$APP.AppDir/
-cp ./$APP.AppDir/*128.png ./$APP.AppDir/$APP.png
-
-cat >> ./$APP.AppDir/AppRun << 'EOF'
-#!/bin/sh
-HERE="$(dirname "$(readlink -f "${0}")")"
-export UNION_PRELOAD="${HERE}"
-export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/:"${HERE}"/lib/:LD_LIBRARY_PATH
-EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-exec ${HERE}/vivaldi-snapshot "$@" &&
-exec ${HERE}/update-ffmpeg --user 2> /dev/null
-EOF
-chmod a+x ./$APP.AppDir/AppRun
-ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./$APP.AppDir
+CHANNEL="snapshot"
+mkdir -p "$CHANNEL" && cp ./appimagetool ./"$CHANNEL"/appimagetool && cd "$CHANNEL" || exit 1
+_create_vivaldi_appimage
 cd ..
-mv ./tmp2/*AppImage ./Vivaldi-Snapshot-$VERSION-x86_64.AppImage
+mv ./"$CHANNEL"/*.AppImage ./
+
+cd ..
+mv ./tmp/*.AppImage ./
