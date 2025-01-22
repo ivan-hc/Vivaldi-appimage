@@ -48,21 +48,23 @@ _create_vivaldi_appimage(){
 	else
 		sed -i "s/CHROME/$APP-$CHANNEL/g" ./"$APP".AppDir/AppRun
 	fi
-	ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 ./$APP.AppDir
-	mv ./*.AppImage ./Vivaldi-"$CHANNEL"-"$VERSION"-x86_64.AppImage || exit 1
+
+	ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
+	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|Vivaldi-appimage|continuous|*x86_64.AppImage.zsync" \
+	./"$APP".AppDir Vivaldi-"$CHANNEL"-"$VERSION"-x86_64.AppImage || exit 1
 }
 
 CHANNEL="stable"
 mkdir -p "$CHANNEL" && cp ./appimagetool ./"$CHANNEL"/appimagetool && cd "$CHANNEL" || exit 1
 _create_vivaldi_appimage
 cd ..
-mv ./"$CHANNEL"/*.AppImage ./
+mv ./"$CHANNEL"/*.AppImage* ./
 
 CHANNEL="snapshot"
 mkdir -p "$CHANNEL" && cp ./appimagetool ./"$CHANNEL"/appimagetool && cd "$CHANNEL" || exit 1
 _create_vivaldi_appimage
 cd ..
-mv ./"$CHANNEL"/*.AppImage ./
+mv ./"$CHANNEL"/*.AppImage* ./
 
 cd ..
-mv ./tmp/*.AppImage ./
+mv ./tmp/*.AppImage* ./
