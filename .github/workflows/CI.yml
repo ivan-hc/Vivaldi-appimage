@@ -17,8 +17,9 @@ jobs:
     - name: build
       run: |
         sudo apt update && sudo apt install desktop-file-utils
-        chmod a+x ./vivaldi-builder.sh
+        chmod a+x ./vivaldi-builder.sh ./vivaldi-builder-arm64.sh
         ./vivaldi-builder.sh
+        ./vivaldi-builder-arm64.sh
         mkdir dist
         mv *AppImage* dist/
 
