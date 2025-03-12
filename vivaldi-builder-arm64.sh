@@ -51,7 +51,7 @@ _create_vivaldi_appimage(){
 	fi
 
 	ARCH=aarch64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
-	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|Vivaldi-appimage|continuous|*aarch64.AppImage.zsync" \
+	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|Vivaldi-appimage|continuous|*-$CHANNEL-*aarch64.AppImage.zsync" \
 	./"$APP".AppDir Vivaldi-"$CHANNEL"-"$VERSION"-aarch64.AppImage || exit 1
 }
 
