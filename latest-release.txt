@@ -1,4 +1,4 @@
 https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-snapshot-7.5.3704.3-1-aarch64.AppImage
 https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-snapshot-7.5.3704.3-1-x86_64.AppImage
-https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-stable-7.4.3684.38-1-aarch64.AppImage
-https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-stable-7.4.3684.38-1-x86_64.AppImage
+https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-stable-7.4.3684.43-1-aarch64.AppImage
+https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-stable-7.4.3684.43-1-x86_64.AppImage
