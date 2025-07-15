@@ -1,5 +1,1 @@
-https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-snapshot-7.5.3735.34-1-aarch64.AppImage
-https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-snapshot-7.5.3735.34-1-x86_64.AppImage
-https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-stable-7.5.3735.47-1-aarch64.AppImage
-https://github.com/ivan-hc/Vivaldi-appimage/releases/download/continuous/Vivaldi-stable-7.5.3735.47-1-x86_64.AppImage
-Mon Jul 14 01:16:38 UTC 2025
+Tue Jul 15 01:16:35 UTC 2025
