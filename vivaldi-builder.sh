@@ -8,7 +8,7 @@ cd ./tmp || exit 1
 
 # DOWNLOAD APPIMAGETOOL
 if ! test -f ./appimagetool; then
-	wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+	wget -q https://github.com/pkgforge-dev/appimagetool/releases/latest/download/appimagetool-x86_64-linux -O appimagetool
 	chmod a+x ./appimagetool
 fi
 
@@ -27,8 +27,10 @@ _create_vivaldi_appimage(){
 	mv ./usr/share/applications/*.desktop ./"$APP".AppDir/
 	if [ "$CHANNEL" = "stable" ]; then
 		cp ./"$APP".AppDir/*128.png ./"$APP".AppDir/"$APP".png
+		cp ./"$APP".AppDir/"$APP".png ./"$APP".AppDir/.DirIcon
 	else
 		cp ./"$APP".AppDir/*128.png ./"$APP".AppDir/"$APP"-"$CHANNEL".png
+		cp ./"$APP".AppDir/"$APP"-"$CHANNEL".png ./"$APP".AppDir/.DirIcon
 	fi
 	tar xf ./control.tar.xz
 	VERSION=$(cat control | grep Version | cut -c 10-)
@@ -49,9 +51,10 @@ _create_vivaldi_appimage(){
 		sed -i "s/CHROME/$APP-$CHANNEL/g" ./"$APP".AppDir/AppRun
 	fi
 
-	ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
+	APPIMAGE_ARCH=x86_64 VERSION="$VERSION" ./appimagetool \
 	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|Vivaldi-appimage|continuous|*-$CHANNEL-*x86_64.AppImage.zsync" \
-	./"$APP".AppDir Vivaldi-"$CHANNEL"-"$VERSION"-x86_64.AppImage || exit 1
+	-n Vivaldi-"$CHANNEL"-"$VERSION"-x86_64.AppImage \
+	./"$APP".AppDir || exit 1
 }
 
 CHANNEL="stable"
